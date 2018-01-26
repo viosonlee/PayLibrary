@@ -22,10 +22,17 @@ public class AliPay {
     private static final String RESULT_STATUS = "resultStatus";
     private static final int PAY_RESULT = 0x0011;
     private static ResultHandler resultHandler;
+    private static PayResultHandler payResultHandler;
 
     public static AlipayBuilder build(ResultHandler resultHandler) {
         AlipayBuilder alipayBuilder = new AlipayBuilder();
         AliPay.resultHandler = resultHandler;
+        return alipayBuilder;
+    }
+
+    public static AlipayBuilder build(PayResultHandler payResultHandler) {
+        AlipayBuilder alipayBuilder = new AlipayBuilder();
+        AliPay.payResultHandler = payResultHandler;
         return alipayBuilder;
     }
 
@@ -38,6 +45,11 @@ public class AliPay {
                         bundle.getString(RESULT),
                         bundle.getString(RESULT_STATUS));
                 resultHandler.onResultBack(result);
+                if (result.resultStatus == "9000") {
+                    payResultHandler.onPaySuccess();
+                } else {
+                    payResultHandler.onError(result.resultStatus);
+                }
             }
         }
     }
@@ -94,13 +106,7 @@ public class AliPay {
     public interface ResultHandler {
         void onResultBack(Result result);
     }
-
-    public static class Result {
-        String memo;
-        String result;
-        String resultStatus;
-
-        //resultStatus结果码含义
+    //resultStatus结果码含义
         /*9000	订单支付成功
         8000	正在处理中，支付结果未知（有可能已经支付成功），请查询商户订单列表中订单的支付状态
         4000	订单支付失败
@@ -109,6 +115,29 @@ public class AliPay {
         6002	网络连接出错
         6004	支付结果未知（有可能已经支付成功），请查询商户订单列表中订单的支付状态
         其它	    其它支付错误*/
+    public static class ResultStatus {
+        public static final String RESULT_PAY_SUCCESS = "9000";
+        public static final String RESULT_PAY_DETALING = "8000";
+        public static final String RESULT_PAY_FAILURE = "4000";
+        public static final String RESULT_REPEATED_REQUEST = "5000";
+        public static final String RESULT_USER_CANCEL = "6001";
+        public static final String RESULT_NET_ERROR = "6002";
+        public static final String RESULT_UBKNOW = "6004";
+        public static final String RESULT_OTHER_ERROR = "其它";
+    }
+
+    public interface PayResultHandler {
+        void onPaySuccess();
+
+        void onError(String resultStatus);
+    }
+
+    public static class Result {
+        String memo;
+        String result;
+        String resultStatus;
+
+
         Result(String memo, String result, String resultStatus) {
             this.memo = memo;
             this.result = result;
