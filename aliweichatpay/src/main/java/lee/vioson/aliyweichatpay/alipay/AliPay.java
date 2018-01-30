@@ -44,11 +44,15 @@ public class AliPay {
                 Result result = new Result(bundle.getString(MEMO),
                         bundle.getString(RESULT),
                         bundle.getString(RESULT_STATUS));
-                resultHandler.onResultBack(result);
-                if (result.resultStatus == "9000") {
-                    payResultHandler.onPaySuccess();
-                } else {
-                    payResultHandler.onError(result.resultStatus);
+                if (resultHandler != null) {
+                    resultHandler.onResultBack(result);
+                }
+                if (payResultHandler != null) {
+                    if (result.resultStatus == "9000") {
+                        payResultHandler.onPaySuccess();
+                    } else {
+                        payResultHandler.onError(result.resultStatus);
+                    }
                 }
             }
         }
@@ -106,6 +110,7 @@ public class AliPay {
     public interface ResultHandler {
         void onResultBack(Result result);
     }
+
     //resultStatus结果码含义
         /*9000	订单支付成功
         8000	正在处理中，支付结果未知（有可能已经支付成功），请查询商户订单列表中订单的支付状态
