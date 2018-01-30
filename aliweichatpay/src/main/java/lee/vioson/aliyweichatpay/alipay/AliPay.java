@@ -142,6 +142,17 @@ public class AliPay {
         String result;
         String resultStatus;
 
+        public String getMemo() {
+            return memo;
+        }
+
+        public String getResult() {
+            return result;
+        }
+
+        public String getResultStatus() {
+            return resultStatus;
+        }
 
         Result(String memo, String result, String resultStatus) {
             this.memo = memo;
