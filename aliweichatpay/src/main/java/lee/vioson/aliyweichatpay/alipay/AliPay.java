@@ -51,7 +51,7 @@ public class AliPay {
                     if (result.resultStatus == "9000") {
                         payResultHandler.onPaySuccess();
                     } else {
-                        payResultHandler.onError(result.resultStatus);
+                        payResultHandler.onError(result);
                     }
                 }
             }
@@ -134,7 +134,7 @@ public class AliPay {
     public interface PayResultHandler {
         void onPaySuccess();
 
-        void onError(String resultStatus);
+        void onError(Result resultStatus);
     }
 
     public static class Result {
